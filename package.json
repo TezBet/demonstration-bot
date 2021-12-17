@@ -1,0 +1,26 @@
+{
+  "name": "demonstration-bot",
+  "version": "0.1.0",
+  "description": "A bot to bridge data from a soccer api to our smart contract. Used for testing purposes only. Will be replaced by an oracle in the final version",
+  "main": "server.js",
+  "scripts": {
+    "test": "node test.js",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TezBet/demonstration-bot.git"
+  },
+  "author": "TezBet",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TezBet/demonstration-bot/issues"
+  },
+  "homepage": "https://github.com/TezBet/demonstration-bot#readme",
+  "dependencies": {
+    "@taquito/signer": "^11.0.2",
+    "@taquito/taquito": "^11.0.2",
+    "axios": "^0.24.0",
+    "dotenv": "^10.0.0"
+  }
+}
