@@ -3,15 +3,19 @@ const axios = require('axios').default; // Ensures we get autocompletion
 const TezosToolkit = require("@taquito/taquito").TezosToolkit;
 const InMemorySigner = require("@taquito/signer").InMemorySigner;
 
-const today = new Date();
-today.setUTCDate(today.getUTCDate() + 3);
-
-const todayString = new Date().toISOString().split('T').at(0);
-const tomorrowDate = today.toISOString().split('T').at(0);
 const Tezos = new TezosToolkit(process.env.TEZOS_RPC);
 
 function normalize(input) {
     return input.normalize("NFD").replace(/\p{Diacritic}/gu, "");
+}
+
+function timeRange(date, secondsForward, secondsBackward) {
+    const forward = new Date();
+    const backward = new Date();
+    forward.setTime(date.getTime() + secondsForward * 1000);
+    backward.setTime(date.getTime() - secondsBackward * 1000);
+    
+    return { forward: forward, backward: backward };
 }
 
 async function TezosSelfSign() {
@@ -37,6 +41,10 @@ async function loadContractStorage() {
 }
 
 async function loadGamesFromSoccerApi(storageGames) {
+    const { backward, forward } = timeRange(new Date(), 60*60*24, 60*60*24);
+    const backwardString = backward.toISOString().split('T').at(0);
+    const forwardString = forward.toISOString().split('T').at(0);
+
     const instance = axios.create({
         baseURL: 'http://api.football-data.org/',
         timeout: 30000,
@@ -46,8 +54,8 @@ async function loadGamesFromSoccerApi(storageGames) {
     await instance.get('/v2/matches/', {
         params: {
             limit: 50,
-            dateFrom: todayString,
-            dateTo: tomorrowDate,
+            dateFrom: backwardString,
+            dateTo: forwardString,
         }
     }).then(async (res) => {
         console.log("Got answer from soccer API: " + res.status);
@@ -131,5 +139,4 @@ async function main() {
     console.log("Done");
 }
 
-main();
-
+module.exports = {main: main, timeRange: timeRange};
