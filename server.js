@@ -85,8 +85,7 @@ async function loadGamesFromSoccerApi(storageGames) {
                 console.log("Already exists");
             }
 
-            if (game.status === "FINISHED" && (!(game.id in storageGames) || storageGames[game.id] === -1)) {
-
+            if (game.status === "FINISHED" && (!(game.id in storageGames) || storageGames[game.id].outcome === -1)) {
                 let winner = -1;
                 switch(game.score.winner) {
                     case "HOME_TEAM":
