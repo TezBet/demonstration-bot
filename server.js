@@ -76,13 +76,21 @@ async function loadGamesFromSoccerApi(storageGames) {
 
                 transactions++;
                 batch.withContractCall(contract.methodsObject.new_game({
-                    game_id: game.id.toString(),
+                    game_id: game.id,
                     team_a: normalize(game.homeTeam.name),
                     team_b: normalize(game.awayTeam.name),
                     match_timestamp: Math.round(Date.parse(game.utcDate) / 1000).toString(),
                 }))
-            } else {
-                console.log("Already exists");
+            }
+
+            if (game.status == "POSTPONED" || game.status == "CANCELED") {
+                console.log("Game suspended or canceled. Deleting");
+
+                transactions++;
+                batch.withContractCall(contract.methodsObject.set_outcome({
+                    game_id: game.id,
+                    choice: 10,
+                }));
             }
 
             if (game.status === "FINISHED" && (!(game.id in storageGames) || storageGames[game.id].outcome === -1)) {
@@ -106,12 +114,11 @@ async function loadGamesFromSoccerApi(storageGames) {
 
                     transactions++;
                     batch.withContractCall(contract.methodsObject.set_outcome({
-                        game_id: game.id.toString(10),
+                        game_id: game.id,
                         choice: winner,
                     }));
                 }
             }
-            console.log();
         }
 
         if (transactions > 0) {
